@@ -5,16 +5,18 @@ mod add_name;
 mod add_category;
 mod delete_card_kanban;
 mod add_quantity_stock;
+mod create_card_kanban_with_all_field;
 
 #[cfg(test)]
 mod tests {
-    use crate::{add_name, add_quantity_stock};
+    use crate::{add_name, create_card_kanban_with_all_field};
     use crate::add_card_kanban_to_list_without_duplicate::add_card_kanban_to_list_without_duplicate;
     use crate::add_category::add_category;
     use crate::add_name::add_name;
     use crate::add_quantity_stock::add_quantity_stock;
     use crate::CardKanban::CardKanban;
     use crate::create_card_kanban::create_card_kanban;
+    use crate::create_card_kanban_with_all_field::create_card_kanban_with_all_field;
     use crate::delete_card_kanban::delete_card_kanban;
 
     #[test]
@@ -111,6 +113,14 @@ mod tests {
         card_kanban_carotte = add_name(card_kanban_carotte, "carotte");
         card_kanban_carotte = add_quantity_stock(card_kanban_carotte, 10);
 
+        assert_eq!(card_kanban_carotte.quantity_stock, 10);
+    }
+    #[test]
+    fn it_should_create_card_kanban_with_all_field() {
+        let mut card_kanban_carotte = create_card_kanban_with_all_field("carotte", "legume", 10);
+
+        assert_eq!(card_kanban_carotte.name, "carotte");
+        assert_eq!(card_kanban_carotte.category, "legume");
         assert_eq!(card_kanban_carotte.quantity_stock, 10);
     }
 }
