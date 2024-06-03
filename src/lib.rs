@@ -4,13 +4,15 @@ mod create_card_kanban;
 mod add_name;
 mod add_category;
 mod delete_card_kanban;
+mod add_quantity_stock;
 
 #[cfg(test)]
 mod tests {
-    use crate::{add_name, delete_card_kanban};
+    use crate::{add_name, add_quantity_stock};
     use crate::add_card_kanban_to_list_without_duplicate::add_card_kanban_to_list_without_duplicate;
     use crate::add_category::add_category;
     use crate::add_name::add_name;
+    use crate::add_quantity_stock::add_quantity_stock;
     use crate::CardKanban::CardKanban;
     use crate::create_card_kanban::create_card_kanban;
     use crate::delete_card_kanban::delete_card_kanban;
@@ -110,13 +112,5 @@ mod tests {
         card_kanban_carotte = add_quantity_stock(card_kanban_carotte, 10);
 
         assert_eq!(card_kanban_carotte.quantity_stock, 10);
-    }
-
-    fn add_quantity_stock(card_kanban: CardKanban, quantityStock: i32) -> CardKanban {
-        CardKanban {
-            name: card_kanban.name,
-            category: card_kanban.category,
-            quantity_stock: quantityStock
-        }
     }
 }
