@@ -108,6 +108,8 @@ mod tests {
         card_kanban_carotte = add_category(card_kanban_carotte, "legume");
         card_kanban_carotte = add_name(card_kanban_carotte, "carotte");
         card_kanban_carotte = add_quantity_stock(card_kanban_carotte, 10);
+
+        assert_eq!(card_kanban_carotte.quantity_stock, 10);
     }
 
     fn add_quantity_stock(card_kanban: CardKanban, quantityStock: i32) -> CardKanban {
