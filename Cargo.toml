@@ -4,3 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+tailwind-css = "0.13.0"
+yew = { git = "https://github.com/yewstack/yew/", features = ["csr"] }
+
+

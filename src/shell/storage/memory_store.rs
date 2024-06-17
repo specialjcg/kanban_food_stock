@@ -1,15 +1,15 @@
-use std::io;
-use std::sync::Mutex;
 use crate::domain_core::CardKanban::CardKanban;
 use crate::shell::storage::Storage;
+use std::io;
+use std::sync::Mutex;
 
 #[derive()]
-pub struct MemoryStore{
-    pub listCard: Mutex<Vec<CardKanban>>
+pub struct MemoryStore {
+    pub listCard: Mutex<Vec<CardKanban>>,
 }
 
 pub fn create_MemoryStore() -> MemoryStore {
-    MemoryStore{
+    MemoryStore {
         listCard: Mutex::new(Vec::new()),
     }
 }
