@@ -1,4 +1,4 @@
 /target
 # Ignore the .idea directory
 .idea/
-/dist
+dist
