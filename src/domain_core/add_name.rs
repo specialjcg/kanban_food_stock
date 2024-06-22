@@ -18,7 +18,7 @@ fn it_should_create_a_card_kanban_with_name() {
         CardKanban {
             name: "test".to_string(),
             category: "".to_string(),
-            quantity_stock: 0
+            quantity_stock: 0,
         }
     );
 }

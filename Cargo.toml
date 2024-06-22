@@ -6,5 +6,7 @@ edition = "2021"
 [dependencies]
 tailwind-css = "0.13.0"
 yew = { git = "https://github.com/yewstack/yew/", features = ["csr"] }
+web-sys = "0.3.69"
+log = "0.4.21"
 
 

@@ -1,4 +1,4 @@
-use yew::Properties;
+use yew::{Callback, Properties};
 
 #[derive(PartialEq, Debug, Clone,Properties)]
 pub struct CardKanban {

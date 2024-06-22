@@ -4,17 +4,13 @@ use crate::domain_core::create_card_kanban::create_card_kanban;
 use crate::domain_core::CardKanban::CardKanban;
 
 pub fn add_card_kanban_to_list_without_duplicate(
-    card_kanban: CardKanban,
-    mut list_Kanban: Vec<CardKanban>,
+    new_card: CardKanban,
+    mut cards: Vec<CardKanban>,
 ) -> Vec<CardKanban> {
-    for x in &list_Kanban {
-        if x.name == card_kanban.name && x.category == card_kanban.category {
-            // Return  list if duplicate is found
-            return list_Kanban;
-        }
+    if !cards.iter().any(|card| card.name == new_card.name) {
+        cards.push(new_card);
     }
-    list_Kanban.push(card_kanban);
-    list_Kanban
+    cards
 }
 #[test]
 fn it_should_create_a_list_of_card_kanban_with_no_doublon() {

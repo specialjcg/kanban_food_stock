@@ -1,5 +1,5 @@
 pub(crate) mod CardKanban;
-mod add_card_kanban_to_list_without_duplicate;
+pub(crate) mod add_card_kanban_to_list_without_duplicate;
 mod add_category;
 mod add_name;
 mod add_quantity_stock;
