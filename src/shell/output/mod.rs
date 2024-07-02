@@ -1,4 +1,4 @@
-use crate::domain_core::CardKanban::CardKanban;
+use crate::domain_core::card_kanban::CardKanban;
 pub(crate) mod console_output;
 
 

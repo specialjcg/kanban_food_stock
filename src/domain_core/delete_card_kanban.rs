@@ -1,8 +1,8 @@
 use crate::domain_core::add_card_kanban_to_list_without_duplicate::add_card_kanban_to_list_without_duplicate;
 use crate::domain_core::add_category::add_category;
 use crate::domain_core::add_name::add_name;
-use crate::domain_core::create_card_kanban::create_card_kanban;
-use crate::domain_core::CardKanban::CardKanban;
+use crate::domain_core::create_card_kanban::{create_card_kanban, create_kanban_item};
+use crate::domain_core::card_kanban::CardKanban;
 
 pub fn delete_card_kanban(deletedCard: CardKanban, listCard: Vec<CardKanban>) -> Vec<CardKanban> {
     listCard
@@ -12,9 +12,12 @@ pub fn delete_card_kanban(deletedCard: CardKanban, listCard: Vec<CardKanban>) ->
 }
 #[test]
 fn it_should_delete_a_card_kanban_from_a_list_of_card() {
-    let mut card_kanban_carotte = create_card_kanban();
-    let mut card_kanban_concomber = create_card_kanban();
+    let kanban_item_carotte = create_kanban_item("carotte", 20);
+    let kanban_item_concomber = create_kanban_item("concomber", 10);
 
+    // Create CardKanban
+    let mut card_kanban_carotte = create_card_kanban("legume", vec![kanban_item_carotte.clone()]);
+    let mut card_kanban_concomber = create_card_kanban("legume", vec![kanban_item_concomber.clone()]);
     card_kanban_carotte = add_category(card_kanban_carotte, "legume");
     card_kanban_carotte = add_name(card_kanban_carotte, "carotte");
     card_kanban_concomber = add_category(card_kanban_concomber, "legume");

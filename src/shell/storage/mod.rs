@@ -1,4 +1,4 @@
-use crate::domain_core::CardKanban::CardKanban;
+use crate::domain_core::card_kanban::CardKanban;
 use std::io;
 
 pub(crate) mod memory_store;

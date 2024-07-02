@@ -1,40 +1,45 @@
+use yew::Callback;
 use crate::domain_core::add_name::add_name;
-use crate::domain_core::create_card_kanban::create_card_kanban;
-use crate::domain_core::CardKanban::CardKanban;
+use crate::domain_core::create_card_kanban::{create_card_kanban, create_kanban_item};
+use crate::domain_core::card_kanban::{CardKanban, KanbanItem};
 
-pub fn add_category(p0: CardKanban, p1: &str) -> CardKanban {
-    return CardKanban {
-        name: p0.name,
-        category: p1.to_string(),
-        quantity_stock: 0,
-    };
+pub fn add_category(card: CardKanban, category: &str) -> CardKanban {
+    CardKanban {
+        category: category.to_string(),
+        items: card.items,
+        on_delete: card.on_delete, // Preserve existing items
+    }
+}
+pub fn add_name_and_quantity(card: CardKanban, name: &str, quantity_stock: i32) -> CardKanban {
+    let mut items = card.items;
+    items.push(create_kanban_item(name, quantity_stock));
+    CardKanban {
+        category: card.category,
+        items,
+        on_delete: card.on_delete,
+    }
 }
 
-#[test]
+#[test]#[test]
 fn it_should_create_a_card_kanban_with_category() {
-    let mut card_kanban = create_card_kanban();
-    card_kanban = add_category(card_kanban, "test");
-    assert_eq!(
-        card_kanban,
-        CardKanban {
-            name: "".to_string(),
-            category: "test".to_string(),
-            quantity_stock: 0
-        }
-    );
+    let kanban_item_carotte = create_kanban_item("carotte", 20);
+    let mut card_kanban =create_card_kanban("legume", vec![kanban_item_carotte.clone()]);
+
+
+    // Create CardKanban
+    let card_kanban = add_category(card_kanban, "test");
+
+    assert_eq!(card_kanban.category, "test");
+
 }
 #[test]
-fn it_should_create_a_card_kanban_with_category_name_and_name() {
-    let mut card_kanban = create_card_kanban();
-    card_kanban = add_category(card_kanban, "legume");
-    card_kanban = add_name(card_kanban, "carotte");
+fn it_should_create_a_card_kanban_with_category_and_items() {
+    let card_kanban = create_card_kanban("", vec![]);
+    let card_kanban = add_category(card_kanban, "legume");
+    let card_kanban = add_name_and_quantity(card_kanban, "carotte", 0);
 
-    assert_eq!(
-        card_kanban,
-        CardKanban {
-            name: "carotte".to_string(),
-            category: "legume".to_string(),
-            quantity_stock: 0
-        }
-    );
+  assert_eq!(card_kanban.category, "legume");
+  assert_eq!(card_kanban.items.len(), 1);
+  assert_eq!(card_kanban.items[0].name, "carotte");
+  assert_eq!(card_kanban.items[0].quantity_stock, 0);
 }

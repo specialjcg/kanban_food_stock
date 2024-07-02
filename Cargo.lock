@@ -645,7 +645,10 @@ name = "kanban_food_stock"
 version = "0.1.0"
 dependencies = [
  "log",
+ "serde",
+ "serde_json",
  "tailwind-css",
+ "wasm-bindgen",
  "web-sys",
  "yew",
 ]

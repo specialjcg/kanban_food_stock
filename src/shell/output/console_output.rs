@@ -1,4 +1,4 @@
-use crate::domain_core::CardKanban::CardKanban;
+use crate::domain_core::card_kanban::CardKanban;
 use crate::shell::output::{console_output, Output};
 
 pub struct ConsoleOutput {
@@ -13,8 +13,12 @@ pub fn create_console_output() -> ConsoleOutput {
 
 impl Output for ConsoleOutput {
     fn print(&mut self, card: &CardKanban) {
-        let message = format!("Card: {:?}", card);
-        self.printed.push(message.clone());
-        println!("{}", message);
+        // Serialize card to JSON, skipping the `on_delete` field
+        let json_str = serde_json::to_string(card)
+            .unwrap_or_else(|err| format!("Serialization failed: {}", err));
+
+        // Store and print the serialized JSON
+        self.printed.push(json_str.clone());
+        println!("{}", json_str);
     }
 }
