@@ -21,6 +21,8 @@ struct CardsProps {
 fn card(props: &CardKanban) -> Html {
     let edit_mode = use_state(|| false);
     let items = use_state(|| props.items.clone());
+    let show_item_modal = use_state(|| false);
+    let error_message = use_state(|| None as Option<String>);
     let toggle_edit = {
         let edit_mode = edit_mode.clone();
         Callback::from(move |_| {
@@ -41,6 +43,40 @@ fn card(props: &CardKanban) -> Html {
             );
         })
     };
+    // Open item modal
+    let open_item_modal = {
+        let show_item_modal = show_item_modal.clone();
+        Callback::from(move |_| {
+            show_item_modal.set(true);
+        })
+    };
+
+    // Close item modal
+    let close_item_modal = {
+        let show_item_modal = show_item_modal.clone();
+        Callback::from(move |_| {
+            show_item_modal.set(false);
+        })
+    };
+
+    // Add item to the list
+    let add_item = {
+        let items = items.clone();
+        let close_item_modal = close_item_modal.clone();
+        let set_error_message = error_message.clone();
+        Callback::from(move |item_name: String| {
+            if item_name.is_empty() {
+                set_error_message.set(Some("Item name cannot be empty".to_string()));
+            } else {
+                let mut current_items = (*items).clone();
+                let new_item = create_kanban_item(&item_name, 0); // Or set initial stock as needed
+                current_items.push(new_item);
+                items.set(current_items);
+                set_error_message.set(None);
+                close_item_modal.emit(());
+            }
+        })
+    };
     html! {
         <div class="card max-w-xs bg-white bg-opacity-30 backdrop-blur-lg rounded-xl shadow-lg p-6 m-4 transition-transform transform hover:scale-105 hover:shadow-2xl">
             <div class="kanban-card-header bg-gradient-to-r from-pink-200 to-blue-200 rounded-xl text-white px-4 py-2 text-lg font-bold flex justify-between items-center">
@@ -49,6 +85,11 @@ fn card(props: &CardKanban) -> Html {
                     <div class="icon text-xl cursor-pointer" onclick={toggle_edit.clone()}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 3.487a1.125 1.125 0 011.588 0l2.062 2.062a1.125 1.125 0 010 1.588l-9.244 9.244a1.125 1.125 0 01-.488.29l-3.222 1.078a1.125 1.125 0 01-1.414-1.414l1.078-3.222a1.125 1.125 0 01.29-.488l9.244-9.244zM8.25 13.5l2.25 2.25m1.5-1.5L16.5 9.75m-6.75 6.75L9 15.75m-.75.75h-1.5v-1.5"/>
+                        </svg>
+                    </div>
+         <div class="icon text-xl cursor-pointer" onclick={open_item_modal.clone()}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m-7-7h14" />
                         </svg>
                     </div>
                     <div class="icon text-xl cursor-pointer" onclick={on_delete.clone()}>
@@ -72,13 +113,91 @@ fn card(props: &CardKanban) -> Html {
                             </svg>
                         </div>
                     </div>
+
                 }
                 }) }
+            </div>
+        if *show_item_modal {
+                <ItemModal
+                    on_submit={add_item.clone()}
+                    on_cancel={close_item_modal.clone()}
+                    error_message={(*error_message).clone()}
+                />
+            }
+        </div>
+    }
+}
+#[derive(Properties, PartialEq, Clone)]
+struct ItemModalProps {
+    pub on_submit: Callback<String>,
+    pub on_cancel: Callback<()>,
+    pub error_message: Option<String>,
+}
+
+#[function_component(ItemModal)]
+fn item_modal(props: &ItemModalProps) -> Html {
+    let item_name = use_state(|| "".to_string());
+
+    let on_input = {
+        let item_name = item_name.clone();
+        Callback::from(move |e: InputEvent| {
+            if let Some(input) = e.target_dyn_into::<web_sys::HtmlInputElement>() {
+                item_name.set(input.value());
+            }
+        })
+    };
+
+    let on_submit = {
+        let item_name = (*item_name).clone();
+        let on_submit = props.on_submit.clone();
+        Callback::from(move |e: MouseEvent| {
+            e.prevent_default();
+            on_submit.emit(item_name.clone());
+        })
+    };
+
+    let on_cancel = {
+        let on_cancel = props.on_cancel.clone();
+        Callback::from(move |e: MouseEvent| {
+            e.prevent_default();
+            on_cancel.emit(());
+        })
+    };
+
+    html! {
+        <div class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50">
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <h2 class="text-lg font-bold mb-4">{ "Add New Item" }</h2>
+                <input
+                    type="text"
+                    class="border rounded p-2 mb-4 w-full"
+                    placeholder="Enter item name"
+                    value={(*item_name).clone()}
+                    oninput={on_input}
+                />
+                { if let Some(ref error_message) = props.error_message {
+                    html! { <p class="text-red-500 mb-4">{ error_message }</p> }
+                } else {
+                    html! {}
+                }}
+                <div class="flex justify-end">
+                    <button
+                        class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600 mr-2"
+                        onclick={on_submit.clone()}
+                    >
+                        { "Add" }
+                    </button>
+                    <button
+                        class="bg-gray-500 text-white px-4 py-2 rounded shadow hover:bg-gray-600"
+                        onclick={on_cancel.clone()}
+                    >
+                        { "Cancel" }
+                    </button>
+                </div>
             </div>
         </div>
     }
 }
-
 #[derive(Properties, PartialEq, Clone)]
 struct ModalProps {
     pub on_submit: Callback<String>,
