@@ -11,10 +11,12 @@ use crate::shell::storage::Storage;
 
 mod domain_core;
 mod shell;
+
 #[derive(Properties, PartialEq, Clone)]
 struct CardsProps {
     pub memory_store: MemoryStore,
 }
+
 #[function_component(Card)]
 fn card(props: &CardKanban) -> Html {
     let edit_mode = use_state(|| false);
@@ -29,7 +31,6 @@ fn card(props: &CardKanban) -> Html {
         let on_delete = props.on_delete.clone();
         Callback::from(move |_| on_delete.emit(()))
     };
-    // Handle item delete
     let delete_item = {
         let items = items.clone();
         Callback::from(move |item_name: String| {
@@ -74,7 +75,6 @@ fn card(props: &CardKanban) -> Html {
                 }
                 }) }
             </div>
-
         </div>
     }
 }
@@ -85,6 +85,7 @@ struct ModalProps {
     pub on_cancel: Callback<()>,
     pub error_message: Option<String>,
 }
+
 #[function_component(Modal)]
 fn modal(props: &ModalProps) -> Html {
     let category_name = use_state(|| "".to_string());
@@ -157,12 +158,10 @@ fn cards(props: &CardsProps) -> Html {
         let store = memory_store.clone();
         use_state(move || store.load().unwrap_or_else(|_| Vec::new()))
     };
-    let error_message = use_state(|| None as Option<String>);
-
 
     let show_modal = use_state(|| false);
+    let error_message = use_state(|| None as Option<String>);
 
-    // Callback to show the modal
     let open_modal = {
         let show_modal = show_modal.clone();
         Callback::from(move |_| {
@@ -170,16 +169,15 @@ fn cards(props: &CardsProps) -> Html {
         })
     };
 
-    // Callback to close the modal
     let close_modal = {
         let show_modal = show_modal.clone();
-        let set_error_message = error_message.clone();
+        let error_message = error_message.clone();
         Callback::from(move |_| {
             show_modal.set(false);
-            set_error_message.set(None);
+            error_message.set(None); // Clear error message when modal is closed
         })
     };
-    // Callback to add a new card
+
     let add_card = {
         let cards = cards.clone();
         let close_modal = close_modal.clone();
@@ -191,15 +189,11 @@ fn cards(props: &CardsProps) -> Html {
             let new_card = create_card_kanban_with_all_fields(&category_name, vec![new_item.clone()]);
 
             let mut current_cards = (*cards).clone(); // Access the inner Vec<CardKanban>
-            let mut duplicate_found = false;
-
-            {
+            let duplicate_found = {
                 let stored_cards = store.list_card.lock().unwrap();
-                if stored_cards.iter().any(|card| card.category == new_card.category) {
-                    duplicate_found = true;
-                    return;
-                }
-            }
+                stored_cards.iter().any(|card| card.category == new_card.category)
+            };
+
             if duplicate_found {
                 set_error_message.set(Some(format!("Category '{}' already exists!", category_name)));
             } else {
@@ -207,14 +201,11 @@ fn cards(props: &CardsProps) -> Html {
                 store.save(current_cards.clone()).unwrap();
                 cards.set(current_cards);
                 set_error_message.set(None);
+                close_modal.emit(()); // Close the modal after successful addition
             }
-            // Logging for debugging
-
-            close_modal.emit(());
         })
     };
 
-    // Callback to delete a card
     let delete_card = {
         let cards = cards.clone();
         let store = memory_store.clone();
@@ -228,9 +219,10 @@ fn cards(props: &CardsProps) -> Html {
             }
         })
     };
+
     html! {
         <div class="container mx-auto p-4">
-           <div class="flex justify-end mb-4">
+            <div class="flex justify-end mb-4">
                 <button
                     class="bg-blue-500 text-white px-4 py-2 rounded shadow hover:bg-blue-600"
                     onclick={open_modal}
@@ -252,7 +244,7 @@ fn cards(props: &CardsProps) -> Html {
                     })
                 }
             </div>
-           if *show_modal {
+            if *show_modal {
                 <Modal
                     on_submit={add_card.clone()}
                     on_cancel={close_modal.clone()}
@@ -267,8 +259,6 @@ fn cards(props: &CardsProps) -> Html {
 pub fn App() -> Html {
     let memory_store = create_memory_store();
 
-
-    // Define initial data
     let item1 = create_kanban_item("carotte", 10);
     let item2 = create_kanban_item("concombre", 5);
     let card_kanban_carotte = create_card_kanban_with_all_fields("legume", vec![item1.clone(), item2.clone()]);
@@ -280,21 +270,17 @@ pub fn App() -> Html {
         card_kanban_carotte,
         card_kanban_concombre,
     ];
-         if memory_store.save(initial_cards.clone()).is_ok() {
-                 memory_store.save(initial_cards).unwrap();
-             html! {
 
-
-
-        <Cards memory_store={memory_store} />
-
+    if memory_store.save(initial_cards.clone()).is_ok() {
+        memory_store.save(initial_cards).unwrap();
+        html! {
+            <Cards memory_store={memory_store} />
+        }
+    } else {
+        html! {<p>{ "Failed to save initial data to MemoryStore" }</p>}
     }
-             } else {
-                html! {<p>{ "Failed to save initial data to MemoryStore" }</p>}
-             }
 }
 
 fn main() {
-        yew::Renderer::<App>::new().render();
-
+    yew::Renderer::<App>::new().render();
 }
