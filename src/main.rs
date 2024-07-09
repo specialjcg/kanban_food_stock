@@ -1,11 +1,14 @@
 use log::info;
-use web_sys::console;
+use wasm_bindgen::JsValue;
+use web_sys::{console, window};
+use web_sys::js_sys::Atomics::store;
 use web_sys::wasm_bindgen::JsCast;
 use yew::prelude::*;
 
 use crate::domain_core::card_kanban::CardKanban;
 use crate::domain_core::create_card_kanban::create_kanban_item;
 use crate::domain_core::create_card_kanban_with_all_field::create_card_kanban_with_all_fields;
+use crate::domain_core::list_kanban::{load_list_kanban, save_list_kanban};
 use crate::shell::storage::memory_store::{create_memory_store, MemoryStore};
 use crate::shell::storage::Storage;
 
@@ -272,12 +275,8 @@ fn modal(props: &ModalProps) -> Html {
 
 #[function_component(Cards)]
 fn cards(props: &CardsProps) -> Html {
-    let memory_store = props.memory_store.clone();
-    let cards = {
-        let store = memory_store.clone();
-        use_state(move || store.load().unwrap_or_else(|_| Vec::new()))
-    };
-
+    // State to hold the list of cards
+    let cards = use_state(|| load_list_kanban(&props.memory_store).unwrap_or_default());
     let show_modal = use_state(|| false);
     let error_message = use_state(|| None as Option<String>);
 
@@ -293,7 +292,7 @@ fn cards(props: &CardsProps) -> Html {
         let error_message = error_message.clone();
         Callback::from(move |_| {
             show_modal.set(false);
-            error_message.set(None); // Clear error message when modal is closed
+            error_message.set(None);
         })
     };
 
@@ -301,40 +300,37 @@ fn cards(props: &CardsProps) -> Html {
         let cards = cards.clone();
         let close_modal = close_modal.clone();
         let set_error_message = error_message.clone();
-        let store = memory_store.clone();
-
+        let memory_store = props.memory_store.clone();
         Callback::from(move |category_name: String| {
-            let new_item = create_kanban_item("New Item", 0);
-            let new_card = create_card_kanban_with_all_fields(&category_name, vec![new_item.clone()]);
-
-            let mut current_cards = (*cards).clone(); // Access the inner Vec<CardKanban>
-            let duplicate_found = {
-                let stored_cards = store.list_card.lock().unwrap();
-                stored_cards.iter().any(|card| card.category == new_card.category)
-            };
-
-            if duplicate_found {
+            if cards.iter().any(|card| card.category == category_name) {
                 set_error_message.set(Some(format!("Category '{}' already exists!", category_name)));
             } else {
-                current_cards.push(new_card);
-                store.save(current_cards.clone()).unwrap();
-                cards.set(current_cards);
+                let new_card = create_card_kanban_with_all_fields(&category_name, vec![create_kanban_item("New Item", 0)]);
+                let mut new_cards = (*cards).clone();
+                new_cards.push(new_card);
+                match save_list_kanban(&memory_store, new_cards.clone()) {
+                    Ok(_) => window().unwrap().alert_with_message("Successfully saved the new state to memory store.").unwrap(),
+                    Err(e) => window().unwrap().alert_with_message(&format!("Failed to save the new state to memory store: {}", e)).unwrap(),
+                }
+                cards.set(new_cards.clone());
                 set_error_message.set(None);
-                close_modal.emit(()); // Close the modal after successful addition
+                close_modal.emit(());
             }
         })
     };
 
     let delete_card = {
         let cards = cards.clone();
-        let store = memory_store.clone();
-
+        let memory_store = props.memory_store.clone();
         Callback::from(move |index: usize| {
-            let mut current_cards = (*cards).clone(); // Access the inner Vec<CardKanban>
-            if index < current_cards.len() {
-                current_cards.remove(index);
-                store.save(current_cards.clone()).unwrap();
-                cards.set(current_cards);
+            let mut new_cards = (*cards).clone();
+            if index < new_cards.len() {
+                new_cards.remove(index);
+                cards.set(new_cards.clone());
+                match save_list_kanban(&memory_store, new_cards.clone()) {
+                    Ok(_) => window().unwrap().alert_with_message("Successfully saved the new state to memory store.").unwrap(),
+                    Err(e) => window().unwrap().alert_with_message(&format!("Failed to save the new state to memory store: {}", e)).unwrap(),
+                }
             }
         })
     };
@@ -351,7 +347,7 @@ fn cards(props: &CardsProps) -> Html {
             </div>
             <div class="flex flex-wrap">
                 {
-                    for (*cards).iter().enumerate().map(|(index, card)| {
+                    for cards.iter().enumerate().map(|(index, card)| {
                         html! {
                             <Card
                                 key={index}
@@ -373,7 +369,6 @@ fn cards(props: &CardsProps) -> Html {
         </div>
     }
 }
-
 #[function_component]
 pub fn App() -> Html {
     let memory_store = create_memory_store();

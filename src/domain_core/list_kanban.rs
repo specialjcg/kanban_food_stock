@@ -39,12 +39,13 @@ fn it_should_console_output() {
     );
 }
 
-fn load_list_kanban<S: Storage>(storage: &S) -> io::Result<Vec<CardKanban>> {
+pub(crate) fn load_list_kanban<S: Storage>(storage: &S) -> io::Result<Vec<CardKanban>> {
     storage.load()
 }
 
-fn save_list_kanban<S: Storage>(storage: &S, cards: Vec<CardKanban>) {
+pub(crate) fn save_list_kanban<S: Storage>(storage: &S, cards: Vec<CardKanban>) -> Result<(), Box<dyn std::error::Error>> {
     storage.save(cards).expect("TODO: panic message");
+    Ok(())
 }
 
 fn display_card<O: Output>(output: &mut O, card: &CardKanban) {
