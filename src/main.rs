@@ -1,14 +1,9 @@
 use web_sys::wasm_bindgen::JsCast;
-use web_sys::window;
 use yew::prelude::*;
-use crate::components::{Card, Modal};
-use crate::components::card::CardsProps;
+
 use crate::components::cards::Cards;
-
-
 use crate::domain_core::create_card_kanban::create_kanban_item;
 use crate::domain_core::create_card_kanban_with_all_field::create_card_kanban_with_all_fields;
-use crate::domain_core::list_kanban::{load_list_kanban, save_list_kanban};
 use crate::shell::storage::memory_store::create_memory_store;
 use crate::shell::storage::Storage;
 

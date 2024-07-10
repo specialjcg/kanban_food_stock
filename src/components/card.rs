@@ -1,5 +1,6 @@
 use yew::{Callback, function_component, Html, html, Properties, use_state};
 use crate::components::item_modal::ItemModal;
+use crate::components::ItemName;
 use crate::domain_core::card_kanban::CardKanban;
 use crate::domain_core::create_card_kanban::create_kanban_item;
 use crate::shell::storage::memory_store::MemoryStore;
@@ -97,7 +98,7 @@ pub fn card(props: &CardKanban) -> Html {
                     let item_name = item.name.clone();
                     html! {
                     <div class="flex items-center justify-between mb-2">
-                        <div class="flex-1 text-base font-bold truncate">{ &item.name }</div>
+                        <ItemName name={item.name.clone()} />
                         <div class="flex-none text-sm text-gray-600 mx-4">{ format!("Stock: {}", item.quantity_stock) }</div>
                         <div class="flex-none icon text-xl cursor-pointer" onclick={Callback::from(move |_| delete_item.emit(item_name.clone()))}>
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
