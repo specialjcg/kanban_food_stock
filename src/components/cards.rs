@@ -95,11 +95,18 @@ pub fn cards(props: &CardsProps) -> Html {
             let mut new_cards = (*cards).clone();
             if card_index < new_cards.len() {
                 let card = &mut new_cards[card_index];
-                card.items.push(create_kanban_item(&item_name, 0));
-                cards.set(new_cards.clone());
-                match save_list_kanban(&memory_store, new_cards.clone()) {
-                    Ok(_) => window().unwrap().alert_with_message("Successfully saved the new state to memory store.").unwrap(),
-                    Err(e) => window().unwrap().alert_with_message(&format!("Failed to save the new state to memory store: {}", e)).unwrap(),
+
+                // Check if the item already exists
+                if !card.items.iter().any(|item| item.name == item_name) {
+                    card.items.push(create_kanban_item(&item_name, 0));
+                    cards.set(new_cards.clone());
+
+                    match save_list_kanban(&memory_store, new_cards.clone()) {
+                        Ok(_) => window().unwrap().alert_with_message("Successfully saved the new state to memory store.").unwrap(),
+                        Err(e) => window().unwrap().alert_with_message(&format!("Failed to save the new state to memory store: {}", e)).unwrap(),
+                    }
+                } else {
+                    window().unwrap().alert_with_message("Item already exists in the card.").unwrap();
                 }
             }
         })
