@@ -15,6 +15,7 @@ pub struct CardProps {
     pub items: Vec<KanbanItem>,
     pub on_delete: Callback<()>,
     pub on_delete_item: Callback<String>,
+    pub on_add_item: Callback<String>,
 }
 
 #[function_component(Card)]
@@ -57,26 +58,22 @@ pub fn card(props: &CardProps) -> Html {
             show_item_modal.set(false);
         })
     };
-
     // Add item to the list
     let add_item = {
-        let items = props.items.clone();
+        let on_add_item = props.on_add_item.clone();
         let close_item_modal = close_item_modal.clone();
         let set_error_message = error_message.clone();
         Callback::from(move |item_name: String| {
             if item_name.is_empty() {
                 set_error_message.set(Some("Item name cannot be empty".to_string()));
             } else {
-                let mut current_items = items.clone();
-                let new_item = create_kanban_item(&item_name, 0); // Or set initial stock as needed
-                current_items.push(new_item);
-                // Here we need a mechanism to propagate the updated items back to the parent component.
-                // This can be done through a callback prop, if implemented.
+                on_add_item.emit(item_name.clone());
                 set_error_message.set(None);
                 close_item_modal.emit(());
             }
         })
     };
+
 
     html! {
         <div class="card max-w-xs bg-white bg-opacity-30 backdrop-blur-lg rounded-xl shadow-lg p-6 m-4 transition-transform transform hover:scale-105 hover:shadow-2xl">
