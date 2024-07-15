@@ -10,6 +10,7 @@ pub fn create_card_kanban_with_all_fields(
         category: category.to_string(),
         items,
         on_delete: Callback::default(),
+        on_delete_item: Callback::default(),
     }
 }
 

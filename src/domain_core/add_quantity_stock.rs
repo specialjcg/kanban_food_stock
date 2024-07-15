@@ -16,6 +16,8 @@ pub fn add_quantity_stock(card_kanban: CardKanban, item_name: &str, quantity_sto
         category: card_kanban.category,
         items,
         on_delete: card_kanban.on_delete,
+        on_delete_item: Callback::default(),
+
     }
 }
 

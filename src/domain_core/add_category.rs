@@ -7,7 +7,9 @@ pub fn add_category(card: CardKanban, category: &str) -> CardKanban {
     CardKanban {
         category: category.to_string(),
         items: card.items,
-        on_delete: card.on_delete, // Preserve existing items
+        on_delete: card.on_delete,
+        on_delete_item: Callback::default(),
+        // Preserve existing items
     }
 }
 pub fn add_name_and_quantity(card: CardKanban, name: &str, quantity_stock: i32) -> CardKanban {
@@ -17,6 +19,8 @@ pub fn add_name_and_quantity(card: CardKanban, name: &str, quantity_stock: i32) 
         category: card.category,
         items,
         on_delete: card.on_delete,
+        on_delete_item: Callback::default(),
+
     }
 }
 

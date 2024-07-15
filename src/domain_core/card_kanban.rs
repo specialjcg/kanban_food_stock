@@ -28,8 +28,11 @@ impl PartialEq for KanbanItem {
 #[derive(PartialEq, Debug, Clone, Properties, Serialize, Deserialize)]
 pub struct CardKanban {
     pub(crate) category: String,
-    pub items: Vec<KanbanItem>,
+    pub  items: Vec<KanbanItem>,
     #[serde(skip)] // Skip this field during serialization
     #[prop_or_default]
     pub on_delete: Callback<()>,
+    #[serde(skip)]
+    #[prop_or_default]
+    pub on_delete_item: Callback<String>,
 }

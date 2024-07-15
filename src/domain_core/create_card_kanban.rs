@@ -14,6 +14,8 @@ pub fn create_card_kanban(category: &str, items: Vec<KanbanItem>) -> CardKanban 
         category: category.to_string(),
         items,
         on_delete: Callback::default(),
+        on_delete_item: Callback::default(),
+
     }
 }
 // Function to delete an item from a CardKanban

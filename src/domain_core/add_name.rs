@@ -15,6 +15,8 @@ pub fn add_name(card: CardKanban, name: &str) -> CardKanban {
         category: card.category,
         items,
         on_delete: card.on_delete,
+        on_delete_item: Callback::default(),
+
     }
 }
 

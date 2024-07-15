@@ -6,7 +6,7 @@ use crate::domain_core::list_kanban::{load_list_kanban, save_list_kanban};
 use crate::shell::storage::memory_store::create_memory_store;
 use crate::shell::storage::Storage;
 
-pub fn delete_card_kanban_by_index(mut cards: &mut Vec<CardKanban>, index: usize) -> &mut Vec<CardKanban> {
+pub fn delete_card_kanban_by_index( cards: &mut Vec<CardKanban>, index: usize) -> &mut Vec<CardKanban> {
     if index < cards.len() {
         cards.remove(index); // Remove the card at the specified index
     }

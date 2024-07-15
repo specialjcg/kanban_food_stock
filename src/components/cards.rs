@@ -2,6 +2,8 @@ use web_sys::window;
 use yew::{Callback, function_component, Html, html, use_state};
 use crate::components::{Card, Modal};
 use crate::components::card::CardsProps;
+use crate::domain_core::card_kanban::_CardKanban::items;
+use crate::domain_core::card_kanban::{CardKanban, KanbanItem};
 use crate::domain_core::create_card_kanban::create_kanban_item;
 use crate::domain_core::create_card_kanban_with_all_field::create_card_kanban_with_all_fields;
 use crate::domain_core::list_kanban::{load_list_kanban, save_list_kanban};
@@ -55,10 +57,29 @@ pub fn cards(props: &CardsProps) -> Html {
     let delete_card = {
         let cards = cards.clone();
         let memory_store = props.memory_store.clone();
+        let set_error_message = error_message.clone();
         Callback::from(move |index: usize| {
-            let mut new_cards = (*cards).clone();
+            let mut new_cards: Vec<CardKanban> = (*cards).clone();
             if index < new_cards.len() {
                 new_cards.remove(index);
+                cards.set(new_cards.clone());
+                match save_list_kanban(&memory_store, new_cards.clone()) {
+                    Ok(_) => window().unwrap().alert_with_message("Successfully saved the new state to memory store.").unwrap(),
+                    Err(e) => window().unwrap().alert_with_message(&format!("Failed to save the new state to memory store: {}", e)).unwrap(),
+                }
+                set_error_message.set(None);
+            }
+        })
+    };
+
+    let delete_item = {
+        let cards = cards.clone();
+        let memory_store = props.memory_store.clone();
+        Callback::from(move |(card_index, item_name): (usize, String)| {
+            let mut new_cards = (*cards).clone();
+            if card_index < new_cards.len() {
+                let card = &mut new_cards[card_index];
+                card.items.retain(|item| item.name != item_name);
                 cards.set(new_cards.clone());
                 match save_list_kanban(&memory_store, new_cards.clone()) {
                     Ok(_) => window().unwrap().alert_with_message("Successfully saved the new state to memory store.").unwrap(),
@@ -81,12 +102,15 @@ pub fn cards(props: &CardsProps) -> Html {
             <div class="flex flex-wrap">
                 {
                     for cards.iter().enumerate().map(|(index, card)| {
+                        let on_delete = delete_card.clone().reform(move |_| index);
+                        let on_delete_item = delete_item.clone().reform(move |item_name| (index, item_name));
                         html! {
                             <Card
                                 key={index}
                                 category={card.category.clone()}
                                 items={card.items.clone()}
-                                on_delete={delete_card.clone().reform(move |_| index)}
+                                on_delete={on_delete}
+                                on_delete_item={on_delete_item}
                             />
                         }
                     })
