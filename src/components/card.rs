@@ -1,3 +1,5 @@
+use wasm_bindgen::JsCast;
+use web_sys::{HtmlInputElement, InputEvent, KeyboardEvent};
 use yew::{Callback, function_component, Html, html, Properties, use_state};
 use crate::components::item_modal::ItemModal;
 use crate::components::{ItemName, ItemStock};
@@ -16,6 +18,8 @@ pub struct CardProps {
     pub on_delete: Callback<()>,
     pub on_delete_item: Callback<String>,
     pub on_add_item: Callback<String>,
+    pub on_update_stock: Callback<(String, i32)>, // New callback for updating stock
+
 }
 
 #[function_component(Card)]
@@ -40,6 +44,13 @@ pub fn card(props: &CardProps) -> Html {
         let on_delete_item = props.on_delete_item.clone();
         Callback::from(move |item_name: String| {
             on_delete_item.emit(item_name.clone());
+        })
+    };
+    // Callback for updating the stock value
+    let update_stock = {
+        let on_update_stock = props.on_update_stock.clone();
+        Callback::from(move |(item_name, stock): (String, i32)| {
+            on_update_stock.emit((item_name, stock));
         })
     };
 
@@ -98,14 +109,19 @@ pub fn card(props: &CardProps) -> Html {
                 </div>
             </div>
             <div class="kanban-card-body p-4">
-                { for props.items.iter().map(|item| {
+                { for props.items.iter().enumerate().map(|(index, item)|  {
                     let delete_item = delete_item.clone();
                     let item_name = item.name.clone();
+                    let stoc_name=item.name.clone();
+                     let update_stock = update_stock.clone();
                     html! {
                         <div class="flex items-center justify-between mb-2">
                             <ItemName name={item.name.clone()} />
-                            <ItemStock quantity_stock={item.quantity_stock} />
-                            <div class="flex-none icon text-xl cursor-pointer" onclick={Callback::from(move |_| delete_item.emit(item_name.clone()))}>
+                           <ItemStock quantity_stock={item.quantity_stock.clone()}
+                                on_update_stock={Callback::from(move |new_stock| {
+                                    update_stock.emit((item_name.clone(), new_stock));
+                                })} />
+                        <div class="flex-none icon text-xl cursor-pointer" onclick={Callback::from(move |_| delete_item.emit(stoc_name.clone()))}>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>

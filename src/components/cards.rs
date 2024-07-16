@@ -111,7 +111,25 @@ pub fn cards(props: &CardsProps) -> Html {
             }
         })
     };
+    let update_stock = {
+        let cards = cards.clone();
+        let memory_store = props.memory_store.clone();
+        Callback::from(move |(card_index, item_name, new_stock): (usize, String, i32)| {
+            let mut new_cards = (*cards).clone();
+            if card_index < new_cards.len() {
+                let card = &mut new_cards[card_index];
+                if let Some(item) = card.items.iter_mut().find(|item| item.name == item_name) {
+                    item.quantity_stock = new_stock as i32;
+                }
+                cards.set(new_cards.clone());
+                match save_list_kanban(&memory_store, new_cards.clone()) {
+                    Ok(_) => window().unwrap().alert_with_message("Successfully saved the new state to memory store.").unwrap(),
+                    Err(e) => window().unwrap().alert_with_message(&format!("Failed to save the new state to memory store: {}", e)).unwrap(),
+                }
 
+            }
+        })
+    };
     html! {
         <div class="container mx-auto p-4">
             <div class="flex justify-end mb-4">
@@ -128,6 +146,7 @@ pub fn cards(props: &CardsProps) -> Html {
                         let on_delete = delete_card.clone().reform(move |_| index);
                         let on_delete_item = delete_item.clone().reform(move |item_name| (index, item_name));
                         let on_add_item = add_item.clone().reform(move |item_name| (index, item_name));
+                        let on_update_stock = update_stock.clone().reform(move |(item_name, new_stock)| (index, item_name, new_stock));
 
                         html! {
                             <Card
@@ -137,6 +156,7 @@ pub fn cards(props: &CardsProps) -> Html {
                                 on_delete={on_delete}
                                 on_delete_item={on_delete_item}
                                 on_add_item={on_add_item}
+                        on_update_stock={on_update_stock}
                             />
                         }
                     })
