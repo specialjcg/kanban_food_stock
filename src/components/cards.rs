@@ -1,9 +1,11 @@
+use gloo_timers::callback::Timeout;
 use web_sys::window;
 use yew::{Callback, function_component, Html, html, use_state};
+
 use crate::components::{Card, Modal};
 use crate::components::card::CardsProps;
-use crate::domain_core::card_kanban::_CardKanban::items;
 use crate::domain_core::card_kanban::{CardKanban, KanbanItem};
+use crate::domain_core::card_kanban::_CardKanban::items;
 use crate::domain_core::create_card_kanban::create_kanban_item;
 use crate::domain_core::create_card_kanban_with_all_field::create_card_kanban_with_all_fields;
 use crate::domain_core::list_kanban::{load_list_kanban, save_list_kanban};
@@ -13,6 +15,7 @@ pub fn cards(props: &CardsProps) -> Html {
     // State to hold the list of cards
     let cards = use_state(|| load_list_kanban(&props.memory_store).unwrap_or_default());
     let show_modal = use_state(|| false);
+    let show_save_ok = use_state(|| false);
     let error_message = use_state(|| None as Option<String>);
 
     let open_modal = {
@@ -36,7 +39,11 @@ pub fn cards(props: &CardsProps) -> Html {
         let close_modal = close_modal.clone();
         let set_error_message = error_message.clone();
         let memory_store = props.memory_store.clone();
+        let show_save_ok = show_save_ok.clone();
+
         Callback::from(move |category_name: String| {
+            let show_save_ok = show_save_ok.clone();
+
             if cards.iter().any(|card| card.category == category_name) {
                 set_error_message.set(Some(format!("Category '{}' already exists!", category_name)));
             } else {
@@ -44,7 +51,11 @@ pub fn cards(props: &CardsProps) -> Html {
                 let mut new_cards = (*cards).clone();
                 new_cards.push(new_card);
                 match save_list_kanban(&memory_store, new_cards.clone()) {
-                    Ok(_) => window().unwrap().alert_with_message("Successfully saved the new state to memory store.").unwrap(),
+                    Ok(_) => {
+                        show_save_ok.set(true);
+                        Timeout::new(2000, move || show_save_ok.set(false)).forget();
+
+                    },
                     Err(e) => window().unwrap().alert_with_message(&format!("Failed to save the new state to memory store: {}", e)).unwrap(),
                 }
                 cards.set(new_cards.clone());
@@ -58,13 +69,21 @@ pub fn cards(props: &CardsProps) -> Html {
         let cards = cards.clone();
         let memory_store = props.memory_store.clone();
         let set_error_message = error_message.clone();
+        let show_save_ok = show_save_ok.clone();
+
         Callback::from(move |index: usize| {
             let mut new_cards: Vec<CardKanban> = (*cards).clone();
+            let show_save_ok = show_save_ok.clone();
+
             if index < new_cards.len() {
                 new_cards.remove(index);
                 cards.set(new_cards.clone());
                 match save_list_kanban(&memory_store, new_cards.clone()) {
-                    Ok(_) => window().unwrap().alert_with_message("Successfully saved the new state to memory store.").unwrap(),
+                    Ok(_) => {
+                        show_save_ok.set(true);
+                        Timeout::new(2000, move || show_save_ok.set(false)).forget();
+
+                    },
                     Err(e) => window().unwrap().alert_with_message(&format!("Failed to save the new state to memory store: {}", e)).unwrap(),
                 }
                 set_error_message.set(None);
@@ -75,14 +94,22 @@ pub fn cards(props: &CardsProps) -> Html {
     let delete_item = {
         let cards = cards.clone();
         let memory_store = props.memory_store.clone();
+        let show_save_ok = show_save_ok.clone();
+
         Callback::from(move |(card_index, item_name): (usize, String)| {
             let mut new_cards = (*cards).clone();
+            let show_save_ok = show_save_ok.clone();
+
             if card_index < new_cards.len() {
                 let card = &mut new_cards[card_index];
                 card.items.retain(|item| item.name != item_name);
                 cards.set(new_cards.clone());
                 match save_list_kanban(&memory_store, new_cards.clone()) {
-                    Ok(_) => window().unwrap().alert_with_message("Successfully saved the new state to memory store.").unwrap(),
+                    Ok(_) => {
+                        show_save_ok.set(true);
+                        Timeout::new(2000, move || show_save_ok.set(false)).forget();
+
+                    },
                     Err(e) => window().unwrap().alert_with_message(&format!("Failed to save the new state to memory store: {}", e)).unwrap(),
                 }
             }
@@ -91,8 +118,12 @@ pub fn cards(props: &CardsProps) -> Html {
     let add_item = {
         let cards = cards.clone();
         let memory_store = props.memory_store.clone();
+        let show_save_ok = show_save_ok.clone();
+
         Callback::from(move |(card_index, item_name): (usize, String)| {
             let mut new_cards = (*cards).clone();
+            let show_save_ok = show_save_ok.clone();
+
             if card_index < new_cards.len() {
                 let card = &mut new_cards[card_index];
 
@@ -102,7 +133,11 @@ pub fn cards(props: &CardsProps) -> Html {
                     cards.set(new_cards.clone());
 
                     match save_list_kanban(&memory_store, new_cards.clone()) {
-                        Ok(_) => window().unwrap().alert_with_message("Successfully saved the new state to memory store.").unwrap(),
+                        Ok(_) => {
+                            show_save_ok.set(true);
+                            Timeout::new(2000, move || show_save_ok.set(false)).forget();
+
+                        },
                         Err(e) => window().unwrap().alert_with_message(&format!("Failed to save the new state to memory store: {}", e)).unwrap(),
                     }
                 } else {
@@ -114,16 +149,22 @@ pub fn cards(props: &CardsProps) -> Html {
     let update_stock = {
         let cards = cards.clone();
         let memory_store = props.memory_store.clone();
+        let show_save_ok = show_save_ok.clone();
         Callback::from(move |(card_index, item_name, new_stock): (usize, String, i32)| {
             let mut new_cards = (*cards).clone();
             if card_index < new_cards.len() {
                 let card = &mut new_cards[card_index];
+                let show_save_ok = show_save_ok.clone();
                 if let Some(item) = card.items.iter_mut().find(|item| item.name == item_name) {
                     item.quantity_stock = new_stock as i32;
                 }
                 cards.set(new_cards.clone());
                 match save_list_kanban(&memory_store, new_cards.clone()) {
-                    Ok(_) => window().unwrap().alert_with_message("Successfully saved the new state to memory store.").unwrap(),
+                    Ok(_) => {
+                        show_save_ok.set(true);
+                        Timeout::new(2000, move || show_save_ok.set(false)).forget();
+
+                    },
                     Err(e) => window().unwrap().alert_with_message(&format!("Failed to save the new state to memory store: {}", e)).unwrap(),
                 }
 
@@ -162,6 +203,12 @@ pub fn cards(props: &CardsProps) -> Html {
                     })
                 }
             </div>
+            if *show_save_ok {
+
+                <div class="text-green-500">{"Successfully saved the new state to memory store."}</div>
+
+        }
+
             if *show_modal {
                 <Modal
                     on_submit={add_card.clone()}

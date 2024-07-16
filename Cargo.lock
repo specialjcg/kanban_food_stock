@@ -650,6 +650,7 @@ dependencies = [
 name = "kanban_food_stock"
 version = "0.1.0"
 dependencies = [
+ "gloo-timers 0.3.0",
  "log",
  "serde",
  "serde_json",
