@@ -1,8 +1,5 @@
-use yew::Callback;
-use crate::domain_core::add_category::add_category;
-use crate::domain_core::add_name::add_name;
+use crate::domain_core::card_kanban::CardKanban;
 use crate::domain_core::create_card_kanban::{create_card_kanban, create_kanban_item};
-use crate::domain_core::card_kanban::{CardKanban, KanbanItem};
 
 pub fn add_card_kanban_to_list_without_duplicate(
     new_card: CardKanban,
@@ -18,9 +15,6 @@ pub fn add_card_kanban_to_list_without_duplicate(
     }
     cards
 }
-#[test]
-// Utility function to create a new KanbanItem
-
 
 #[test]
 fn it_should_create_a_list_of_card_kanban_with_no_duplicates() {

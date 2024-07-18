@@ -69,12 +69,14 @@ mod tests {
             category: "vegetable".to_string(),
             items: vec![item1.clone()],
             on_delete: Callback::default(),
+            on_delete_item: Default::default(),
         };
 
         let card2 = CardKanban {
             category: "fruit".to_string(),
             items: vec![item2.clone()],
             on_delete: Callback::default(),
+            on_delete_item: Default::default(),
         };
 
         // Save cards
@@ -99,12 +101,14 @@ mod tests {
             category: "vegetable".to_string(),
             items: vec![item1.clone()],
             on_delete: Callback::default(),
+            on_delete_item: Default::default(),
         };
 
         let card2 = CardKanban {
             category: "vegetable".to_string(),
             items: vec![item1.clone()],
             on_delete: Callback::default(),
+            on_delete_item: Default::default(),
         };
 
         // Attempt to save cards with duplicate categories

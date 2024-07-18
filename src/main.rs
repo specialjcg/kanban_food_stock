@@ -2,6 +2,7 @@ use web_sys::wasm_bindgen::JsCast;
 use yew::prelude::*;
 
 use crate::components::cards::Cards;
+use crate::domain_core::add_card_kanban_to_list_without_duplicate::add_card_kanban_to_list_without_duplicate;
 use crate::domain_core::create_card_kanban::create_kanban_item;
 use crate::domain_core::create_card_kanban_with_all_field::create_card_kanban_with_all_fields;
 use crate::shell::storage::memory_store::create_memory_store;
@@ -23,10 +24,8 @@ pub fn App() -> Html {
     let item3 = create_kanban_item("cucumber", 10);
     let card_kanban_concombre = create_card_kanban_with_all_fields("legume1", vec![item3.clone()]);
 
-    let initial_cards = vec![
-        card_kanban_carotte,
-        card_kanban_concombre,
-    ];
+    let mut initial_cards = add_card_kanban_to_list_without_duplicate(card_kanban_carotte, Vec::new());
+    initial_cards = add_card_kanban_to_list_without_duplicate(card_kanban_concombre, initial_cards);
 
     if memory_store.save(initial_cards.clone()).is_ok() {
         memory_store.save(initial_cards).unwrap();

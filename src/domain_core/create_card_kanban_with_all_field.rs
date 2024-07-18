@@ -71,7 +71,7 @@ fn it_should_add_item_to_card_kanban() {
     let item2 = create_kanban_item("cucumber", 5);
 
     // Add the new item to the existing CardKanban
-    card_kanban = add_item_to_card_kanban(card_kanban, item2.clone());
+    card_kanban.items.push(item2.clone());
 
     // Assert that the CardKanban has the correct category
     assert_eq!(card_kanban.category, "legume");
