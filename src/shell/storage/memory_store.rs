@@ -53,7 +53,7 @@ impl PartialEq for MemoryStore {
 mod tests {
     use yew::Callback;
     use super::*;
-    use crate::domain_core::create_card_kanban::create_kanban_item;
+    use crate::domain_core::create_card_kanban_item::create_kanban_item;
 
     #[test]
     fn it_should_save_and_load_cards() {

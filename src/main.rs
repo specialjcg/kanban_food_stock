@@ -3,7 +3,7 @@ use yew::prelude::*;
 
 use crate::components::cards::Cards;
 use crate::domain_core::add_card_kanban_to_list_without_duplicate::add_card_kanban_to_list_without_duplicate;
-use crate::domain_core::create_card_kanban::create_kanban_item;
+use crate::domain_core::create_card_kanban_item::create_kanban_item;
 use crate::domain_core::create_card_kanban_with_all_field::create_card_kanban_with_all_fields;
 use crate::shell::storage::memory_store::create_memory_store;
 use crate::shell::storage::Storage;

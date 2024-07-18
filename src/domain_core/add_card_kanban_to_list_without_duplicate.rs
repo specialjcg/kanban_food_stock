@@ -1,5 +1,6 @@
 use crate::domain_core::card_kanban::CardKanban;
-use crate::domain_core::create_card_kanban::{create_card_kanban, create_kanban_item};
+use crate::domain_core::create_card_kanban_item::{ create_kanban_item};
+use crate::domain_core::create_card_kanban_with_all_field::create_card_kanban_with_all_fields;
 
 pub fn add_card_kanban_to_list_without_duplicate(
     new_card: CardKanban,
@@ -23,8 +24,8 @@ fn it_should_create_a_list_of_card_kanban_with_no_duplicates() {
     let kanban_item_carotte_2 = create_kanban_item("carotte", 15);
 
     // Create CardKanban with a single item
-    let card_kanban_1 = create_card_kanban("legume", vec![kanban_item_carotte_1.clone()]);
-    let card_kanban_2 = create_card_kanban("legume", vec![kanban_item_carotte_2.clone()]);
+    let card_kanban_1 = create_card_kanban_with_all_fields("legume", vec![kanban_item_carotte_1.clone()]);
+    let card_kanban_2 = create_card_kanban_with_all_fields("legume", vec![kanban_item_carotte_2.clone()]);
 
     // Create a list of CardKanban
     let mut cards_kanban = Vec::new();

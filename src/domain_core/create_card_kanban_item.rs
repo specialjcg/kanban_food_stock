@@ -11,18 +11,11 @@ pub fn create_kanban_item(name: &str, quantity_stock: i32) -> KanbanItem {
 }
 
 // Utility function to create a new CardKanban with items
-pub fn create_card_kanban(category: &str, items: Vec<KanbanItem>) -> CardKanban {
-    CardKanban {
-        category: category.to_string(),
-        items,
-        on_delete: Callback::default(),
-        on_delete_item: Callback::default(),
 
-    }
-}
 
 #[cfg(test)]
 mod tests {
+    use crate::domain_core::create_card_kanban_with_all_field::create_card_kanban_with_all_fields;
     use super::*;
 
     // Utility function to create a new KanbanItem
@@ -35,8 +28,8 @@ mod tests {
         let kanban_item_concomber = create_kanban_item("concomber", 10);
 
         // Create CardKanban
-        let card_kanban_1 = create_card_kanban("legume", vec![kanban_item_carotte.clone()]);
-        let card_kanban_2 = create_card_kanban("legume", vec![kanban_item_concomber.clone()]);
+        let card_kanban_1 = create_card_kanban_with_all_fields("legume", vec![kanban_item_carotte.clone()]);
+        let card_kanban_2 = create_card_kanban_with_all_fields("legume", vec![kanban_item_concomber.clone()]);
 
         // Create a list of CardKanban
         let mut cards_kanban = Vec::new();

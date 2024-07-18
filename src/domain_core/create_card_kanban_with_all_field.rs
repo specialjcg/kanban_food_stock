@@ -1,6 +1,6 @@
 use yew::Callback;
 use crate::domain_core::card_kanban::{CardKanban, KanbanItem};
-use crate::domain_core::create_card_kanban::create_kanban_item;
+use crate::domain_core::create_card_kanban_item::create_kanban_item;
 
 pub fn create_card_kanban_with_all_fields(
     category: &str,

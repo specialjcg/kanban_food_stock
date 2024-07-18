@@ -4,7 +4,7 @@ use yew::{Callback, function_component, Html, html, Properties, use_state};
 use crate::components::item_modal::ItemModal;
 use crate::components::{ItemName, ItemStock};
 use crate::domain_core::card_kanban::{CardKanban, KanbanItem};
-use crate::domain_core::create_card_kanban::create_kanban_item;
+use crate::domain_core::create_card_kanban_item::create_kanban_item;
 use crate::shell::storage::memory_store::MemoryStore;
 
 #[derive(Properties, PartialEq, Clone)]
