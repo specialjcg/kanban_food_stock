@@ -143,6 +143,21 @@ pub fn cards(props: &CardsProps) -> Html {
     };
 
     html! {
+         <>
+            <style>
+                { "
+                    @media (max-width: 600px) {
+                        .flex-row {
+                            flex-direction: column;
+                            align-items: center;
+                        }
+
+                        .w-72 {
+                            width: 90%;
+                        }
+                    }
+                " }
+            </style>
         <div class="container mx-auto p-4">
             <div class="flex justify-between items-center mb-4">
                 <h1 class="text-2xl font-bold">{"Kanban Cards"}</h1>
@@ -188,5 +203,6 @@ pub fn cards(props: &CardsProps) -> Html {
                 />
             }
         </div>
+        </>
     }
 }

@@ -91,11 +91,7 @@ pub fn card(props: &CardProps) -> Html {
             <div class="kanban-card-header bg-gradient-to-r from-pink-200 to-blue-200 rounded-xl text-white px-4 py-2 text-lg font-bold flex justify-between items-center">
                 <h1 class="text-2xl font-bold">{&props.category}</h1>
                 <div class="flex space-x-2">
-                    <div class="icon text-xl cursor-pointer p-2 hover:bg-gray-200 rounded-full" onclick={toggle_edit.clone()}>
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 3.487a1.125 1.125 0 011.588 0l2.062 2.062a1.125 1.125 0 010 1.588l-9.244 9.244a1.125 1.125 0 01-.488.29l-3.222 1.078a1.125 1.125 0 01-1.414-1.414l1.078-3.222a1.125 1.125 0 01.29-.488l9.244-9.244zM8.25 13.5l2.25 2.25m1.5-1.5L16.5 9.75m-6.75 6.75L9 15.75m-.75.75h-1.5v-1.5"/>
-                        </svg>
-                    </div>
+
                     <div class="icon text-xl cursor-pointer p-2 hover:bg-gray-200 rounded-full" onclick={open_item_modal.clone()}>
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m-7-7h14" />
@@ -121,7 +117,12 @@ pub fn card(props: &CardProps) -> Html {
                                 on_update_stock={Callback::from(move |new_stock| {
                                     update_stock.emit((item_name.clone(), new_stock));
                                 })} />
-                        <div class="flex-none icon text-xl cursor-pointer p-2 hover:bg-red-200 rounded-full" onclick={Callback::from(move |_| delete_item.emit(stoc_name.clone()))}>
+                        <div class="icon text-xl cursor-pointer p-2 hover:bg-gray-200 rounded-full" onclick={toggle_edit.clone()}>
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 3.487a1.125 1.125 0 011.588 0l2.062 2.062a1.125 1.125 0 010 1.588l-9.244 9.244a1.125 1.125 0 01-.488.29l-3.222 1.078a1.125 1.125 0 01-1.414-1.414l1.078-3.222a1.125 1.125 0 01.29-.488l9.244-9.244zM8.25 13.5l2.25 2.25m1.5-1.5L16.5 9.75m-6.75 6.75L9 15.75m-.75.75h-1.5v-1.5"/>
+                        </svg>
+                    </div>
+                            <div class="flex-none icon text-xl cursor-pointer p-2 hover:bg-red-200 rounded-full" onclick={Callback::from(move |_| delete_item.emit(stoc_name.clone()))}>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                                 </svg>
