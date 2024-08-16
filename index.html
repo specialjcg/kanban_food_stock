@@ -4,8 +4,21 @@
         <meta charset="UTF-8">
         <title>Title</title>
         <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body></body>
+
+<link rel="modulepreload" href="/kanban_food_stock-2fa131478d9b3a66.js" crossorigin=anonymous integrity="sha384-rMj+Ddq4OjpQeM7A/l/qxxE8aCPdOHT4QpySqLJb3OTJOgh9bgtb6r7amNickHc6">
+<link rel="preload" href="/kanban_food_stock-2fa131478d9b3a66_bg.wasm" crossorigin=anonymous integrity="sha384-S5mTTz625X9nA2HIHdC78vyUudpA7f/Vv0h/rPWgVMwMFcVmM2CcEQaDH+90MClr" as="fetch" type="application/wasm"></head>
+<body>
+<script type="module" nonce="22oPImF2xPUXnRRGNOQTNw==">
+import init, * as bindings from '/kanban_food_stock-2fa131478d9b3a66.js';
+const wasm = await init('/kanban_food_stock-2fa131478d9b3a66_bg.wasm');
+
+
+window.wasmBindings = bindings;
+
+
+dispatchEvent(new CustomEvent("TrunkApplicationStarted", {detail: {wasm}}));
+
+</script></body>
 </html>
 <!--<!DOCTYPE html>-->
 <!--<html lang="en">-->
