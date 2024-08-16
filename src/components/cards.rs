@@ -1,23 +1,24 @@
 use gloo_timers::callback::Timeout;
 use web_sys::window;
-use yew::{Callback, function_component, Html, html, use_state};
+use yew::{Callback, function_component, Html, html, use_effect, use_state};
 
 use crate::components::{Card, Modal};
-use crate::components::card::CardsProps;
+use crate::components::card::{CardsProps};
 use crate::domain_core::add_card_kanban_to_list_without_duplicate::add_card_kanban_to_list_without_duplicate;
 use crate::domain_core::card_kanban::CardKanban;
 use crate::domain_core::create_card_kanban_item::create_kanban_item;
 use crate::domain_core::create_card_kanban_with_all_field::create_card_kanban_with_all_fields;
 use crate::domain_core::list_kanban::{load_list_kanban, save_list_kanban};
+use crate::shell::storage::Storage;
 
 #[function_component(Cards)]
 pub fn cards(props: &CardsProps) -> Html {
     // State to hold the list of cards
-    let cards = use_state(|| load_list_kanban(&props.memory_store).unwrap_or_default());
+    let cards = load_list_kanban(&props.memory_store).unwrap_or_default();
     let show_modal = use_state(|| false);
     let show_save_ok = use_state(|| false);
     let error_message = use_state(|| None );
-
+    web_sys::console::log_1(&format!("test {:?}", cards).into());
     let open_modal = {
         let show_modal = show_modal.clone();
         Callback::from(move |_| {
@@ -35,7 +36,7 @@ pub fn cards(props: &CardsProps) -> Html {
     };
 
     let save_kanban = {
-        let cards = cards.clone();
+        let cards = load_list_kanban(&props.memory_store).unwrap_or_default();
         let memory_store = props.memory_store.clone();
         let show_save_ok = show_save_ok.clone();
         Callback::from(move |new_cards: Vec<CardKanban>| {
@@ -51,7 +52,7 @@ pub fn cards(props: &CardsProps) -> Html {
     };
 
     let add_card = {
-        let cards = cards.clone();
+        let mut cards =load_list_kanban(&props.memory_store).unwrap_or_default();
         let close_modal = close_modal.clone();
         let set_error_message = error_message.clone();
         let save_kanban = save_kanban.clone();
@@ -61,10 +62,10 @@ pub fn cards(props: &CardsProps) -> Html {
                 set_error_message.set(Some(format!("Category '{}' already exists!", category_name)));
             } else {
                 let new_card = create_card_kanban_with_all_fields(&category_name, vec![create_kanban_item("New Item", 0)]);
-                let mut new_cards = (*cards).clone();
+                let mut new_cards = cards.clone();
                 new_cards=add_card_kanban_to_list_without_duplicate(new_card, new_cards.clone());
                 save_kanban.emit(new_cards.clone());
-                cards.set(new_cards.clone());
+                // cards.push(new_cards.clone());
                 set_error_message.set(None);
                 close_modal.emit(());
             }
@@ -72,37 +73,37 @@ pub fn cards(props: &CardsProps) -> Html {
     };
 
     let delete_card = {
-        let cards = cards.clone();
+        let mut cards =load_list_kanban(&props.memory_store).unwrap_or_default();
         let save_kanban = save_kanban.clone();
         Callback::from(move |index: usize| {
-            let mut new_cards: Vec<CardKanban> = (*cards).clone();
+            let mut new_cards: Vec<CardKanban> = cards.clone();
             if index < new_cards.len() {
                 new_cards.remove(index);
-                cards.set(new_cards.clone());
+                // cards.set(new_cards.clone());
                 save_kanban.emit(new_cards.clone());
             }
         })
     };
 
     let delete_item = {
-        let cards = cards.clone();
+        let cards =load_list_kanban(&props.memory_store).unwrap_or_default();
         let save_kanban = save_kanban.clone();
         Callback::from(move |(card_index, item_name): (usize, String)| {
-            let mut new_cards = (*cards).clone();
+            let mut new_cards = cards.clone();
             if card_index < new_cards.len() {
                 let card = &mut new_cards[card_index];
                 card.items.retain(|item| item.name != item_name);
-                cards.set(new_cards.clone());
+                // cards.set(new_cards.clone());
                 save_kanban.emit(new_cards.clone());
             }
         })
     };
 
     let add_item = {
-        let cards = cards.clone();
+        let cards = load_list_kanban(&props.memory_store).unwrap_or_default();
         let save_kanban = save_kanban.clone();
         Callback::from(move |(card_index, item_name): (usize, String)| {
-            let mut new_cards = (*cards).clone();
+            let mut new_cards = cards.clone();
             if card_index < new_cards.len() {
                 let card = &mut new_cards[card_index];
 
@@ -113,26 +114,26 @@ pub fn cards(props: &CardsProps) -> Html {
                 } else {
                     window().unwrap().alert_with_message("Item already exists in the card.").unwrap();
                 }
-                cards.set(new_cards.clone());
+                // cards.set(new_cards.clone());
                 let new_cards=new_cards.clone();
                 save_kanban.emit(new_cards.clone());
             }
         })
     };
     let update_stock = {
-        let cards = cards.clone();
+        let cards = load_list_kanban(&props.memory_store).unwrap_or_default();
         let memory_store = props.memory_store.clone();
         let show_save_ok = show_save_ok.clone();
         let save_kanban = save_kanban.clone();
         Callback::from(move |(card_index, item_name, new_stock): (usize, String, i32)| {
-            let mut new_cards = (*cards).clone();
+            let mut new_cards = cards.clone();
             if card_index < new_cards.len() {
                 let card = &mut new_cards[card_index];
                 let show_save_ok = show_save_ok.clone();
                 if let Some(item) = card.items.iter_mut().find(|item| item.name == item_name) {
                     item.quantity_stock = new_stock as i32;
                 }
-                cards.set(new_cards.clone());
+                // cards.set(new_cards.clone());
                 let new_cards=new_cards.clone();
                 save_kanban.emit(new_cards);
 

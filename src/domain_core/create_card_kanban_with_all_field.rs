@@ -1,3 +1,4 @@
+use web_sys::js_sys::Atomics::xor;
 use yew::Callback;
 use crate::domain_core::card_kanban::{CardKanban, KanbanItem};
 use crate::domain_core::create_card_kanban_item::create_kanban_item;

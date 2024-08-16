@@ -1,16 +1,17 @@
-use wasm_bindgen::JsCast;
-use web_sys::{HtmlInputElement, InputEvent, KeyboardEvent};
 use yew::{Callback, function_component, Html, html, Properties, use_state};
-use crate::components::item_modal::ItemModal;
+
 use crate::components::{ItemName, ItemStock};
-use crate::domain_core::card_kanban::{CardKanban, KanbanItem};
-use crate::domain_core::create_card_kanban_item::create_kanban_item;
+use crate::components::item_modal::ItemModal;
+use crate::domain_core::card_kanban::KanbanItem;
 use crate::shell::storage::memory_store::MemoryStore;
+// use crate::shell::storage::postgres_store::PostgresStore;
+use crate::shell::storage::Storage;
 
 #[derive(Properties, PartialEq, Clone)]
 pub struct CardsProps {
     pub memory_store: MemoryStore,
 }
+
 #[derive(Properties, PartialEq, Clone)]
 pub struct CardProps {
     pub category: String,
@@ -19,7 +20,6 @@ pub struct CardProps {
     pub on_delete_item: Callback<String>,
     pub on_add_item: Callback<String>,
     pub on_update_stock: Callback<(String, i32)>, // New callback for updating stock
-
 }
 
 #[function_component(Card)]

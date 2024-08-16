@@ -1,3 +1,4 @@
 /target
 # Ignore the .idea directory
 .idea/
+src/config.json

@@ -41,6 +41,7 @@ impl Storage for MemoryStore {
         let stored_cards = self.list_card.lock().unwrap();
         Ok(stored_cards.clone())
     }
+
 }
 impl PartialEq for MemoryStore {
     fn eq(&self, other: &Self) -> bool {

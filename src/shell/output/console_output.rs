@@ -1,5 +1,5 @@
 use crate::domain_core::card_kanban::CardKanban;
-use crate::shell::output::{console_output, Output};
+use crate::shell::output::Output;
 
 pub struct ConsoleOutput {
     pub printed: Vec<String>,
